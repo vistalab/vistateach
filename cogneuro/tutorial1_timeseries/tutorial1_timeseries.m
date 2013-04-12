@@ -144,7 +144,7 @@ figure; hold
 plot(ts1_predicted,'-r')
 plot(ts1_demeaned,'-b')
 
-% Now we can loop over all the voxels in this slice (10) and fit this model to
+% Now we can loop over all the voxels in this slice (z=10) and fit this model to
 % each voxel
 
 % First loop over the first dimension (the rows)
@@ -169,4 +169,38 @@ for ii = 1:size(data,1)
         R2(ii,jj) = calculateR2(ts_demeaned, yhat);
     end
 end
+
+% We can now visualize the beta weights as an image
+figure;
+imagesc(B_words);
+% Add a colorbar
+colorbar
+% Scale the axis of the color bar to be from 0 to 150
+caxis([0 150]);
+% Visualize the weights for the scrambled condition
+figure;
+imagesc(B_scramble); colorbar; caxis([0 150]);
+
+% Questions
+%
+% 4. What are the units of the color map?
+%
+% 5. What can we learn from looking at these color maps? Does the pattern
+% of responses make sense (on the scale of brain lobe)? Why or why not?
+%
+% 6. One of the typical ways neuroscientists localize a brain region that
+% responds more to one stimulus class compare to another is by making a
+% subtraction image that compares the weights obtained for each condition.
+% Make a subtraction image and find a voxel (x,y,z coordinates) that
+% responds more to words than scrambled words. Hint: in the matlab figure
+% window if you click on the icon with a plus sign on it it will allow you
+% to click on image pixels and get the x and y coordinates. You already
+% know the z coordinate (that is the slice number).
+
+
+% Typically it is nicer to look at an activation map overlaid over a high
+% resolution anatomical image. Lets load up a high resolution anatomical
+% that is in register with this fmri data
+inplane = niftiRead('Inplane.nii.gz');
+
 
