@@ -282,6 +282,11 @@ caxis([0 150]);
 % Visualize the weights for the scrambled condition
 figure;
 imagesc(B_scramble); colorbar; caxis([0 150]);
+caxis([0 150]);
+
+%% What's this?
+figure
+imagesc(R2)
 
 % Questions
 %
