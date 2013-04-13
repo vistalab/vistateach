@@ -15,14 +15,15 @@
 % steps that take raw fMRI data to the figures of a heatmap on the brain
 % that you see in papers
 %
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Load and visualize the data
 % In an fMRI experiment sequential brain volumes are collected while the
 % stimuli and task are manipulatd. Each brain volume is a 3 dimensional
 % image and each pixel in the image is called a voxel. Here is a video of a
 % single slice of the brain over the course of an fMRI experiment where the
 % subject was presented either words or scrambled words.
 
-% Load the data
 load data
 % Open a figure window
 figure; colormap('gray')
@@ -31,8 +32,10 @@ for ii = 1:size(data,4)
     % Show the image of this slice during volume number ii
     imagesc(squeeze(data(:,:,10,ii))); 
     % pause for .2 seconds
-    drawnow; pause(.2);
+    drawnow; pause(.1);
 end
+
+%% View a single time series
 
 % While it may not look like there is substantial change in pixel intensity
 % over time if we extract the time series from a voxel in the visual cortex
@@ -74,15 +77,30 @@ X(events_words,1) = 1;
 % In the second column denote when scrambled words were presented
 X(events_scramble,2) = 1;
 
-% Show an image of the design matrix
-figure; imagesc(X); colormap('gray'); ylabel('Volume Number'); 
-set(gca, 'xtick',[1 2],'xticklabel', {'word' 'scramble'});
-% And plot what the time series would look like
-figure; hold
-plot(X(:,1),'-r')
+% The two mage shows two columns of the design matrix
+% The column on the left shows the moment when a volume of the brain is
+% collected and a word is presented.  The column on the right shows the
+% volumes when a scrambled word was presented.
+
+figure; 
+% These are the times when a word (red) or a scrambled word (blue) are
+% presented
+subplot(2,1,1)
+plot(X(:,1),'-r'); hold on
 plot(X(:,2),'-b')
 legend('words', 'scramble')
 xlabel('Volume Number'); ylabel('Signal')
+
+% The times for the words and scrambled words are marked in the two columns
+% of this image.  The two columns form a matrix, X, called the design
+% matrix.
+subplot(2,1,2)
+imagesc(X); 
+colormap('gray'); ylabel('Volume Number'); 
+set(gca, 'xtick',[1 2],'xticklabel', {'words' 'scramble'});
+
+
+%% Analyze the time series
 
 % There is one problem with this model of the time series. When a neural
 % event occurs it does not cause a rapid peak in the BOLD signal, but
@@ -95,7 +113,7 @@ xlabel('Volume Number'); ylabel('Signal')
 
 % Load up a typical hemodynamic response function and plot it
 load hrf.mat
-plot(hrf); xlabel('Scans (2 seconds)');
+figure; plot(hrf); xlabel('Scans (2 seconds)');
 
 % Question:
 %
@@ -114,12 +132,18 @@ X(:,2) = conv(X(:,2), hrf, 'same');
 
 % Now notice that the events in the design matrix are smoothed in time
 % reflecting the predicted hrf.
-figure; imagesc(X); colormap('gray'); ylabel('Volume Number'); 
-set(gca, 'xtick',[1 2],'xticklabel', {'word' 'scramble'});
-figure; hold
-plot(X(:,1),'-r')
+figure; 
+subplot(2,1,1)
+plot(X(:,1),'-r'); hold on
 plot(X(:,2),'-b')
 legend('words', 'scramble')
+
+subplot(2,1,2)
+imagesc(X); colormap('gray'); ylabel('Volume Number'); 
+set(gca, 'xtick',[1 2],'xticklabel', {'word' 'scramble'});
+
+
+%% Fitting the linear model to the time series
 
 % There is one more step before we fit a linear model to predict our
 % measured BOLD signal based on the regressors we created around our
@@ -130,6 +154,9 @@ legend('words', 'scramble')
 % of ones to the design matrix before fitting the linear model. These two
 % aproaches are equivalent
 
+% Jason - demeaning like this is different from the usual detrending.  The
+% latter means pulling out the low frequency approximation.  Not sure it
+% matters.
 ts1_demeaned = ts1 - mean(ts1);
 
 % We can now fit our linear model in which we scale each column of the
