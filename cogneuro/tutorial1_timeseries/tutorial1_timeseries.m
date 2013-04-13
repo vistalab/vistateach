@@ -25,7 +25,8 @@
 % subject was presented either words or scrambled words.
 
 load data
-% Open a figure window
+
+%% Open a figure window
 figure; colormap('gray')
 % Make a movie of slice number 10
 for ii = 1:size(data,4)
@@ -42,11 +43,19 @@ end
 % We can see that there is fluctuation in the signal over time. This is due
 % to the blood oxygen level dependent contrast in these images
 
-% Grab the time series from a voxel (x=65, y=45,z=10). The functions
-% squeeze puts this data into a vector
+% BW asks - Why this location?  Do we know it is a good one for this
+% experiment? It looks to me to be in primary visual cortex.
+
+% Extract the time series from a voxel (x=65, y=45,z=10). 
+% (The function squeeze converts the 4D data, (x,y,z,t) into a vector)
 ts1 = squeeze(data(65,45,10,:));
-% Plot the time series
-plot(ts1)
+nTR = size(data,4);   % Number of brain volumes at the repetition rate
+
+% Plot the time series for this single voxel.
+figure; 
+plot(1:nTR,ts1)
+xlabel('TR')
+ylabel('Scanner digital value')
 
 % Questions:
 %
@@ -113,7 +122,8 @@ set(gca, 'xtick',[1 2],'xticklabel', {'words' 'scramble'});
 
 % Load up a typical hemodynamic response function and plot it
 load hrf.mat
-figure; plot(hrf); xlabel('Scans (2 seconds)');
+figure; 
+plot(hrf); xlabel('Scans (2 seconds)');
 
 % Question:
 %
@@ -123,12 +133,54 @@ figure; plot(hrf); xlabel('Scans (2 seconds)');
 % stimuli? Based on this HRF give a few examples of questions that are and
 % are not appropriate to adress with fMRI.
 
-% We can incorporate the knowlege of this hemodynamic response function
-% into our design matrix by "convolving" each event with the hrf. This
-% means that rather than being represented by a brief spike, the regressors
-% are now smoothed in time to match the typical hemodynamic response
-X(:,1) = conv(X(:,1), hrf, 'same');
-X(:,2) = conv(X(:,2), hrf, 'same');
+%% Convert the raw scanner numbers to a percent contrast
+
+% The digital values coming from the scanner have no physical significance.
+% digital values from some regions are a little higher than others for
+% instrumental reasons, say because the coil is more sensitive to the
+% surface of the brain than the middle.  Other uninteresting reasons also
+% give rise to these differences.
+
+% It is common, therefore, to express the time series as a percent
+% modulation around the mean signal. This moves us towards comparing more
+% similar variations - though even this move is not really enough.
+
+
+% BW asks:  The hrf is specified in seconds.  The time series is specified
+% in volumes (TRs).  We need to do something about this, no?
+
+meanTS = mean(ts1(:));
+ts1 = 100* ((ts1 - meanTS)/ meanTS);
+
+% Plot the modulation
+figure; 
+plot(1:nTR,ts1)
+xlabel('TR')
+ylabel('Percent modulation of BOLD signal')
+grid on
+
+
+%%
+% % We can incorporate the knowlege of this hemodynamic response function
+% % into our design matrix by "convolving" each event with the hrf. This
+% % means that rather than being represented by a brief spike, the regressors
+% % are now smoothed in time to match the typical hemodynamic response
+% X(:,1) = conv(X(:,1), hrf, 'same');
+% X(:,2) = conv(X(:,2), hrf, 'same');
+% 
+% % Example of problem with conv
+% test = [0 0 0 0 1 0 0 0 0]
+% hrf  = [1 2 3]
+% conv(test,hrf,'same')
+% 
+% % Notice that the convolution with the hrf shifts to start at the 4th
+% % position, while the event doesn't begin until the 5th position.
+% % Without the 'same' flag the response starts at the right place
+% conv(test,hrf)
+
+% So, let's do this
+tmp = conv(X(:,1),hrf); X(:,1) = tmp(1:length(X(:,1)));
+tmp = conv(X(:,2),hrf); X(:,2) = tmp(1:length(X(:,2)));
 
 % Now notice that the events in the design matrix are smoothed in time
 % reflecting the predicted hrf.
@@ -159,9 +211,26 @@ set(gca, 'xtick',[1 2],'xticklabel', {'word' 'scramble'});
 % matters.
 ts1_demeaned = ts1 - mean(ts1);
 
-% We can now fit our linear model in which we scale each column of the
-% design matrix to best fit our measured signal. 
-[B, B_ci] = regress(ts1_demeaned, X);
+% We fit a linear model in which we scale each column of the
+% design matrix to best fit our measured signal.
+% Usually a linear model means you have a vector you wish to predict, in
+% this case the time series, as the weighted sum of other vectors in the
+% columns of a matrix, in this case the design matrix.  The weights are
+% often called 'beta' weights when we analyze fMRI data.
+%
+%    ts1_demeaned = X * betaWeights
+%
+% Matlab solves these problems with the very simple formula
+B = X\ts1_demeaned;
+
+% This is the same as
+%   [B, B_ci] = regress(ts1_demeaned, X);
+% if you have the statistics toolbox
+
+% These are the 'beta' weights for the word and scrambled word events
+B
+
+%% Comparing the solution with the true data
 
 % The values in B are our beta weights. As with any regression analysis
 % these are the weights that scale our regressors to best predict the
@@ -171,9 +240,15 @@ figure; hold
 plot(ts1_predicted,'-r')
 plot(ts1_demeaned,'-b')
 
-% Now we can loop over all the voxels in this slice (z=10) and fit this model to
-% each voxel
 
+%% Calculate the beta values for the whole slice
+% Now we can loop over all the voxels in this slice (z=10) and fit this
+% model to each voxel
+
+% Allocate space
+B_words    = zeros(size(data,1),size(data,2));
+B_scramble = zeros(size(data,1),size(data,2));
+R2         = zeros(size(data,1),size(data,2));
 % First loop over the first dimension (the rows)
 for ii = 1:size(data,1)
     % For each row we will now loop over the columns in that row
@@ -184,7 +259,7 @@ for ii = 1:size(data,1)
         % demean this time series
         ts_demeaned = ts - mean(ts);
         % Then fit our linear model 
-        B = regress(ts_demeaned,X);
+        B = X\ts_demeaned;
         % Now lets take the beta weight for words and put it into a matrix
         % and the weight for scrambled words and put it into another matrix
         B_words(ii,jj) = B(1);
@@ -197,7 +272,7 @@ for ii = 1:size(data,1)
     end
 end
 
-% We can now visualize the beta weights as an image
+%% We can now visualize the beta weights as an image
 figure;
 imagesc(B_words);
 % Add a colorbar
