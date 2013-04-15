@@ -34,8 +34,9 @@ figure; colormap('gray')
 for ii = 1:size(data,4)
     % Show the image of this slice during volume number ii
     imagesc(squeeze(data(:,:,10,ii))); 
-    % pause for .2 seconds
-    drawnow; pause(.1);
+    % pause for .2 seconds. This means that the video is 10x as fast as the
+    % real data acquisition
+    drawnow; pause(.2);
 end
 
 %% View the time series from a single voxel
@@ -61,11 +62,15 @@ title('Voxel 53 65 10 time series')
 
 % Questions:
 %
-% 1. What are the units of the two axes?
-% 2. Find 1 voxel where the signal varies more over time and another voxel
-% where the signal varies less over time. Plot each voxel's time series and
-% title the figure apropriately. Save these as pdfs and turn them in. Hint:
-% the function std will compute the standard deviation of a vector.
+% 1. What are the units of the two axes? 
+% 2. Find 1 voxel where the signal
+% varies more over time and another voxel where the signal varies less over
+% time than voxel 53 65 10. Plot each voxel's time series and title the
+% figure apropriately. Save these as pdfs and turn them in. Hint: the
+% function std will compute the standard deviation of a vector. 
+% 3. Do you think that we are more or less likely to find an effect of the
+% stimulus in the voxel with more/less signal variation? Explain your
+% thinking
 
 %% Associate the time series with the stimuli
 % These are the times when each event started. Each event lasts 12 seconds
@@ -141,7 +146,7 @@ plot(hrf); xlabel('Volume (TR = 2 seconds)');
 
 % Question:
 %
-% 3. What does this HRF suggest about the type of cognitive questions that
+% 4. What does this HRF suggest about the type of cognitive questions that
 % can be adressed with fMRI? For example would it be feasible to measure
 % precise timing differences in the neural response to different types of
 % stimuli? Based on this HRF give a few examples of questions that are and
@@ -258,6 +263,10 @@ B = X\ts1;
 % events, along with the weights on our nuisance variables.
 disp(B)
 
+% Question:
+% 
+% 5. What are the units of these beta weights here?
+
 %% Comparing the solution with the true data
 
 % The values in B are our beta weights. As with any regression analysis
@@ -280,7 +289,6 @@ plot(ts1,'-b')
 % Allocate space
 B_words    = zeros(size(data,1),size(data,2));
 B_scramble = zeros(size(data,1),size(data,2));
-R2         = zeros(size(data,1),size(data,2));
 
 % First loop over the first dimension of this slice (the rows)
 for ii = 1:size(data,1)
@@ -317,12 +325,12 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 
 % Questions
 %
-% 4. What are the units of the color map?
+% 6. What are the units of the color map?
 %
-% 5. What can we learn from looking at these color maps? Does the pattern
+% 7. What can we learn from looking at these color maps? Does the pattern
 % of responses make sense (on the scale of brain lobe)? Why or why not?
 %
-% 6. One of the typical ways neuroscientists localize a brain region that
+% 8. One of the typical ways neuroscientists localize a brain region that
 % responds more to one stimulus class compare to another is by making a
 % subtraction image that compares the weights obtained for each condition.
 % Make a subtraction image and find a voxel (x,y,z coordinates) that
@@ -349,7 +357,13 @@ map = imresize(B_words, [256 256]);
 threshold = 10;
 overlay2dHeatmap(inplane.data(:,:,10),map, threshold)
 
+% Question:
+%
+% 9. Make an image showing a slice where there is a particularly large
+% difference between the response to words and scrambled words.
+
+%% Note
 % Before we could put this figure in a manuscript we would have to
 % calculate the standard error of each beta value so that we could
 % associate it with a p-value. We will not get into that here though it is
-% actually quite simple
+% actually quite simple. 
