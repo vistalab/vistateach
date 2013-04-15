@@ -344,9 +344,10 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 % resolution anatomical image. Lets load up a high resolution anatomical
 % that is in register with this fmri data. This is saved in an image format
 % know as nifti
-inplane = niftiRead('Inplane.nii.gz');
+load Inplane.mat
+
 % This is what slice 10 of this image looks like. 
-figure;imagesc(inplane.data(:,:,10)); colormap('gray');
+figure;imagesc(inplane(:,:,10)); colormap('gray');
 
 % To overlay our activation map we must first interpolate it to be the same
 % resolution as our anatomy image which is 256x256 pixels
@@ -355,7 +356,7 @@ map = imresize(B_words, [256 256]);
 % Now overlay the colormap on the background image masking out all beta
 % values below 10
 threshold = 10;
-overlay2dHeatmap(inplane.data(:,:,10),map, threshold)
+overlay2dHeatmap(inplane(:,:,10),map, threshold)
 
 % Question:
 %
