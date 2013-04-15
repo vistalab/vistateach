@@ -64,7 +64,8 @@ title('Voxel 53 65 10 time series')
 % 1. What are the units of the two axes?
 % 2. Find 1 voxel where the signal varies more over time and another voxel
 % where the signal varies less over time. Plot each voxel's time series and
-% title the figure apropriately. Save these as pdfs and turn them in.
+% title the figure apropriately. Save these as pdfs and turn them in. Hint:
+% the function std will compute the standard deviation of a vector.
 
 %% Associate the time series with the stimuli
 % These are the times when each event started. Each event lasts 12 seconds
