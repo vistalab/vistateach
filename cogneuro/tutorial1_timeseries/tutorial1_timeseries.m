@@ -19,17 +19,19 @@
 
 %% Load and visualize the data
 % In an fMRI experiment sequential brain volumes are collected while the
-% stimuli and task are manipulatd. Each brain volume is a 3 dimensional
-% image and each pixel in the image is called a voxel. Here is a video of a
-% single slice of the brain over the course of an fMRI experiment where the
-% subject was presented either words or scrambled words. Brain volumes were
-% collected every 2 seconds (TR = 2seconds).
+% stimuli and task are manipulatd. Each sample point in the brain volume is
+% called a voxel (volume element). 
 
-% The data is saved in the same folder as the tutorial
+% The data are saved in the same folder as the tutorial
 load data
 
 % Open a figure window
 figure; colormap('gray')
+
+% Here is a movie of a single slice of the brain over the course of an fMRI
+% experiment where the subject was presented either words or scrambled
+% words. Brain volumes were collected every 2 seconds (TR = 2seconds).
+
 % Make a movie of slice number 10
 for ii = 1:size(data,4)
     % Show the image of this slice during volume number ii
@@ -41,9 +43,9 @@ end
 
 %% View the time series from a single voxel
 
-% While it may not look like there is substantial change in pixel intensity
-% over time if we extract the time series from a voxel in the visual cortex
-% We can see that there is fluctuation in the signal over time. This is due
+% It may not look like there is substantial change in pixel intensity over
+% time. But, if we extract the time series from a voxel in the visual
+% cortex we find there is fluctuation in the signal over time. This is due
 % to the blood oxygen level dependent (BOLD) contrast in these images
 
 % Extract the time series from a voxel row 53, column 65, slice 10. 
@@ -58,21 +60,25 @@ figure;
 plot(1:nTR, ts1)
 xlabel('TR')
 ylabel('Scanner digital value')
-title('Voxel 53 65 10 time series')
+title('Voxel 53 (row) 65 (col) 10 (slice) time series')
 
 % Questions:
 %
 % 1. What are the units of the two axes? 
-% 2. Find 1 voxel where the signal
-% varies more over time and another voxel where the signal varies less over
-% time than voxel 53 65 10. Plot each voxel's time series and title the
-% figure apropriately. Save these as pdfs and turn them in. Hint: the
-% function std will compute the standard deviation of a vector. 
+%
+% 2. Find one voxel where the signal varies more over time and another
+% voxel where the signal varies less over time than voxel 53 65 10. Plot
+% each voxel's time series and title the figure apropriately. Save these as
+% pdfs and turn them in.
+% Hint: the function std will compute the standard deviation of a vector.
+%
 % 3. Do you think that we are more or less likely to find an effect of the
-% stimulus in the voxel with more/less signal variation? Explain your
-% thinking
+% stimulus in the voxel with higher standard deviation? Explain your
+% thinking.  
+% Hint:  There isn't a trivial right answer.  There are competing forces.
 
 %% Associate the time series with the stimuli
+%
 % These are the times when each event started. Each event lasts 12 seconds
 % and there is a blank screen in between events. The timing is with respect
 % to the fMRI volume number. For example 4 means that the event started at
@@ -88,10 +94,10 @@ events_scramble = [4:9 32:37 52:57 69:74 77:82 104:109];
 % make an ideal time series that would reflect the expected response
 % profiles for a voxel that responds to words or scrambled words. We will
 % express this as a matrix with 2 columns, column 1 containing the
-% predicted time series for words and column 2 containing the predicted time
-% series for scrambled words. There will be 114 rows in the matrix because
-% there were 114 volumes collected in the fMRI experiment. This is called
-% the design matrix because it denotes the experimental design.
+% predicted time series for words and column 2 containing the predicted
+% time series for scrambled words. There will be 114 rows in the matrix
+% because there were 114 volumes collected in the fMRI experiment. This is
+% called the design matrix because it denotes the experimental design.
 
 % First we allocate a 114x2 matrix full of zeros
 X = zeros(114,2); 
@@ -115,14 +121,15 @@ xlabel('Volume Number'); ylabel('Signal')
 
 % The times for the words and scrambled words are marked in the two columns
 % of this image.  The two columns form a matrix, X, called the design
-% matrix. One column shows the moment when a volume of the
-% brain is collected and a word is presented.  The other
-% shows the volumes when a scrambled word was presented.
+% matrix. One column shows the moment when a volume of the brain is
+% collected and a word is presented.  The other shows the volumes when a
+% scrambled word was presented.
 
 subplot(2,1,2)
-% The ' symbol transposes the matrix X. We are only doing this so that the
-% 2 plots have a common x axis. After transposing the design matrix the x
-% axis is time  and the y axis is condition rather than vice versa. 
+% The apostrophe (') symbol transposes the matrix X (i.e., turns the
+% columns into rows). We are only doing this so that the 2 plots have a
+% common x axis. After transposing the design matrix the x axis is time
+% and the y axis is condition rather than vice versa.
 imagesc(X'); 
 colormap('gray'); xlabel('Volume Number'); 
 set(gca, 'ytick',[1 2],'yticklabel', {'words' 'scramble'});
@@ -130,14 +137,14 @@ set(gca, 'ytick',[1 2],'yticklabel', {'words' 'scramble'});
 
 %% Analyze the time series
 
-% There is one problem with this model of the time series. When a neural
-% event occurs it does not cause a rapid peak in the BOLD signal, but
-% instead there is a slow response that evolves over time
+% When a neural event occurs it does not cause a rapid peak in the BOLD
+% signal, but instead there is a slow response that evolves over time.
 %
 % We know roughly how the vascular response measured by BOLD evolves over
-% time. This means that when there is an event that stimulates a brief neural
-% response (say a flash of light), the resulting BOLD signal will change in
-% a characteristic way. We call this the hemodynamic response function (HRF). 
+% time. This means that when there is an event that stimulates a brief
+% neural response (say a flash of light), the resulting BOLD signal will
+% change in a characteristic way. We call this the hemodynamic response
+% function (HRF).
 
 % Load up a typical hemodynamic response function and plot it
 load hrf.mat
@@ -174,6 +181,14 @@ xlabel('TR')
 ylabel('Percent modulation of BOLD signal')
 grid on
 
+% Question: 
+%
+% 5. Suppose the MRI scanner is more sensitive to voxels on the surface of
+% the brain compared to voxels in the middle of the brain.  The brain
+% responses in the two voxels are the same, but because of the scanner
+% sensitivity difference the fMRI responses are ts1 and 2*ts1. What will
+% happen to the responses when we transform them from scanner values to
+% percent modulation?
 
 %% Convolving the design matrix with the HRF (sorry for the jargon)
 %
@@ -226,24 +241,23 @@ legend('words', 'scramble')
 % are arbitrary. We are interested in predicting changes in the signal over
 % time but we do not care about the mean value of the time series or other
 % aribtrary factors related to the scanner. To deal with this we include
-% regressors in the design matrix to deal with nuisance factors such as the
-% arbitraryness of the units and slow drift in signal intensity due to
-% imperfections in the instrament. These are often referred to as nuisance
-% regressors. Most researchers will include a column of ones to deal with
-% the offset and a linear term to deal with scanner drift.
+% regressors in the design matrix to measure and eliminate nuisance factors
+% such as the arbitraryness of the units and slow drift in signal intensity
+% due to imperfections in the instrament. These are often referred to as
+% nuisance regressors. Most researchers will include a column of ones to
+% deal with the offset and a linear term to deal with scanner drift.
 X = horzcat(X, ones(size(X,1),1), linspace(-1,1,size(X,1))');
 % Here is our new design matrix
 figure; imagesc(X); colormap('gray')
 % Lable the columns
 set(gca,'xtick',1:4,'xticklabel',{'words' 'scramble' 'offset' 'linear trend'});
 
-% We fit a linear model in which we scale each column of the
-% design matrix to best fit our measured signal.
-% Usually a linear model means you have a vector you wish to predict, in
-% this case the time series, as the weighted sum of other vectors in the
-% columns of a matrix, in this case the design matrix.  The weights are
-% often called 'beta' weights when we analyze fMRI data. Here is the
-% equation for the linear model
+% We fit a linear model in which we scale each column of the design matrix
+% to best fit our measured signal. Usually a linear model means you have a
+% vector you wish to predict, in this case the time series, as the weighted
+% sum of other vectors in the columns of a matrix, in this case the design
+% matrix.  The weights are often called 'beta' weights when we analyze fMRI
+% data. Here is the equation for the linear model
 %
 %    ts1 = X * betaWeights
 %
@@ -251,7 +265,7 @@ set(gca,'xtick',1:4,'xticklabel',{'words' 'scramble' 'offset' 'linear trend'});
 B = X\ts1;
 
 % This is the same as
-%   B = regress(ts1_demeaned, X);
+%   B = regress(ts1, X);
 % if you have the statistics toolbox
 %
 % The point to take away is that fitting a linear model to fMRI data is no
@@ -263,16 +277,13 @@ B = X\ts1;
 % events, along with the weights on our nuisance variables.
 disp(B)
 
-% Question:
-% 
-% 5. What are the units of these beta weights here?
-
 %% Comparing the solution with the true data
 
 % The values in B are our beta weights. As with any regression analysis
 % these are the weights that scale our regressors to best predict the
 % signal. We can now plot our predicted signal agains our measured signal
 ts1_predicted = X*B;
+
 figure; hold
 plot(ts1_predicted,'-r')
 plot(ts1,'-b')
@@ -325,7 +336,7 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 
 % Questions
 %
-% 6. What are the units of the color map?
+% 6. What do the colors in the map represent? 
 %
 % 7. What can we learn from looking at these color maps? Does the pattern
 % of responses make sense (on the scale of brain lobe)? Why or why not?
@@ -333,11 +344,9 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 % 8. One of the typical ways neuroscientists localize a brain region that
 % responds more to one stimulus class compare to another is by making a
 % subtraction image that compares the weights obtained for each condition.
-% Make a subtraction image and find a voxel (x,y,z coordinates) that
-% responds more to words than scrambled words. Hint: The axes are labeled
-% with the row and column numbers so you can look at the figure window and
-% pick out the voxels you want. You already know the z coordinate (that is
-% the slice number).
+% Make a subtraction image. Do you see a region in which the responses are
+% larger to words than scrambled words?
+
 
 %% Overlay the heatmap on a high resolution anatomical image
 % Typically it is nicer to look at an activation map overlaid over a high
@@ -364,7 +373,8 @@ overlay2dHeatmap(inplane(:,:,10),map, threshold)
 % difference between the response to words and scrambled words.
 
 %% Note
-% Before we could put this figure in a manuscript we would have to
-% calculate the standard error of each beta value so that we could
-% associate it with a p-value. We will not get into that here though it is
-% actually quite simple. 
+%
+% Before we put this figure in a manuscript we would have to calculate the
+% standard error of each beta value so that we could associate it with a
+% p-value. We will not get into that here though it is straightforward.
+
