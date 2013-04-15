@@ -136,7 +136,7 @@ set(gca, 'ytick',[1 2],'yticklabel', {'words' 'scramble'});
 % Load up a typical hemodynamic response function and plot it
 load hrf.mat
 figure; 
-plot(hrf); xlabel('Scans (2 seconds)');
+plot(hrf); xlabel('Volume (TR = 2 seconds)');
 
 % Question:
 %
@@ -227,7 +227,7 @@ legend('words', 'scramble')
 % the offset and a linear term to deal with scanner drift.
 X = horzcat(X, ones(size(X,1),1), linspace(-1,1,size(X,1))');
 % Here is our new design matrix
-figure; imagesc(X);
+figure; imagesc(X); colormap('gray')
 
 % We fit a linear model in which we scale each column of the
 % design matrix to best fit our measured signal.
@@ -342,4 +342,7 @@ figure;imagesc(inplane.data(:,:,10)); colormap('gray');
 % resolution as our anatomy image which is 256x256 pixels
 map = imresize(B_words, [256 256]);
 
-
+% Now overlay the colormap on the background image masking out all beta
+% values below 10
+threshold = 10;
+overlay2dHeatmap(inplane.data(:,:,10),map, threshold)
