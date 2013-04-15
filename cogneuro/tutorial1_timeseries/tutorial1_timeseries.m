@@ -375,6 +375,12 @@ overlay2dHeatmap(inplane(:,:,10),map, threshold)
 %
 % 9. Make an image showing a slice where there is a particularly large
 % difference between the response to words and scrambled words.
+%
+% 10. Suppose you identified a region that consitently showed a larger
+% response to words than scrambled words in a group of subjects. How might
+% you design an experiment to test this region's relevance for behavior
+% using either fMRI or any other method that you have learned about in this
+% coures or elsewhere?
 
 %% Note
 %
