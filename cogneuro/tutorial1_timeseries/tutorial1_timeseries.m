@@ -45,9 +45,9 @@ end
 % We can see that there is fluctuation in the signal over time. This is due
 % to the blood oxygen level dependent (BOLD) contrast in these images
 
-% Extract the time series from a voxel (x=65, y=53,z=10). 
+% Extract the time series from a voxel row 53, column 65, slice 10. 
 % (The function squeeze converts the 4D data, (x,y,z,time) into a vector)
-ts1 = squeeze(data(65,53,10,:));
+ts1 = squeeze(data(53,65,10,:));
 
 % This is the number of brain volumes at the repetition rate (TR)
 nTR = size(data,4);   
@@ -57,7 +57,7 @@ figure;
 plot(1:nTR, ts1)
 xlabel('TR')
 ylabel('Scanner digital value')
-title('Voxel 65,53,10 time series')
+title('Voxel 53 65 10 time series')
 
 % Questions:
 %
@@ -228,6 +228,8 @@ legend('words', 'scramble')
 X = horzcat(X, ones(size(X,1),1), linspace(-1,1,size(X,1))');
 % Here is our new design matrix
 figure; imagesc(X); colormap('gray')
+% Lable the columns
+set(gca,'xtick',1:4,'xticklabel',{'words' 'scramble' 'offset' 'linear trend'});
 
 % We fit a linear model in which we scale each column of the
 % design matrix to best fit our measured signal.
@@ -253,7 +255,7 @@ B = X\ts1;
 
 % These are the 'beta' weights for the (1) word and (2) scrambled word
 % events, along with the weights on our nuisance variables.
-B
+disp(B)
 
 %% Comparing the solution with the true data
 
@@ -286,10 +288,8 @@ for ii = 1:size(data,1)
         % Pull out the time series for the voxel in row number ii of column
         % number jj in slice number 10
         ts = squeeze(data(ii,jj,10,:));
-        % demean this time series
-        ts_demeaned = ts - mean(ts);
         % Then fit our linear model 
-        B = X\ts_demeaned;
+        B = X\ts;
         % Now lets take the beta weight for words and put it into a matrix
         % and the weight for scrambled words and put it into another matrix
         B_words(ii,jj) = B(1);
@@ -325,15 +325,16 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 % responds more to one stimulus class compare to another is by making a
 % subtraction image that compares the weights obtained for each condition.
 % Make a subtraction image and find a voxel (x,y,z coordinates) that
-% responds more to words than scrambled words. Hint: in the matlab figure
-% window if you click on the icon with a plus sign on it it will allow you
-% to click on image pixels and get the x and y coordinates. You already
-% know the z coordinate (that is the slice number).
+% responds more to words than scrambled words. Hint: The axes are labeled
+% with the row and column numbers so you can look at the figure window and
+% pick out the voxels you want. You already know the z coordinate (that is
+% the slice number).
 
 %% Overlay the heatmap on a high resolution anatomical image
 % Typically it is nicer to look at an activation map overlaid over a high
 % resolution anatomical image. Lets load up a high resolution anatomical
-% that is in register with this fmri data
+% that is in register with this fmri data. This is saved in an image format
+% know as nifti
 inplane = niftiRead('Inplane.nii.gz');
 % This is what slice 10 of this image looks like. 
 figure;imagesc(inplane.data(:,:,10)); colormap('gray');
@@ -346,3 +347,8 @@ map = imresize(B_words, [256 256]);
 % values below 10
 threshold = 10;
 overlay2dHeatmap(inplane.data(:,:,10),map, threshold)
+
+% Before we could put this figure in a manuscript we would have to
+% calculate the standard error of each beta value so that we could
+% associate it with a p-value. We will not get into that here though it is
+% actually quite simple
