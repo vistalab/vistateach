@@ -1,4 +1,4 @@
-%% fMRI time series
+%% fMRI time series analysis
 %
 % Teaching objectives:
 % 
@@ -333,6 +333,7 @@ caxis([0 30]);
 % Visualize the weights for the scrambled condition
 figure;
 imagesc(B_scramble); colorbar; caxis([0 30]);
+xlabel ('Anterior <--> Posterior'); ylabel('Left <--> Right');
 
 % Questions
 %
@@ -345,7 +346,10 @@ imagesc(B_scramble); colorbar; caxis([0 30]);
 % responds more to one stimulus class compare to another is by making a
 % subtraction image that compares the weights obtained for each condition.
 % Make a subtraction image. Do you see a region in which the responses are
-% larger to words than scrambled words?
+% larger to words than scrambled words? Or vice versa?
+%
+% Extra Credit: How might we normalize these difference maps to make the
+% effects more aparent?
 
 
 %% Overlay the heatmap on a high resolution anatomical image
