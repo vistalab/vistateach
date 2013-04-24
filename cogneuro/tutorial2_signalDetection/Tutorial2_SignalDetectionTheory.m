@@ -43,7 +43,9 @@
 % the mean response for the noise trials to zero and signal trials some
 % larger value, with the standard deviations of the signal and noise
 % responses the same.
-%
+
+%% Initializing the parameters
+
 % Here are some example parameters. Considder these to represent the
 % distribution of internal responses to the signal and noise conditions
 
@@ -60,8 +62,8 @@ sd = 1;
 % points
 z = -4:.2:6;  
 
-noise_y  = normpdf(z,noiseMean,sd);
-signal_y = normpdf(z,signalMean,sd);
+noise_y  = normalpdf(z,noiseMean,sd);
+signal_y = normalpdf(z,signalMean,sd);
 
 figure(1)
 clf
@@ -136,7 +138,7 @@ disp('  ---------------------------------');
 PC = (pHit + pCR)/2;  %proportion correct
 fprintf('  Percent Correct: %5.2f%%\n',100*PC);
 
-%% Questions:
+%% Questions about the parameters
 %
 % Play around with the parameters. See how:
 %
@@ -156,7 +158,7 @@ fprintf('  Percent Correct: %5.2f%%\n',100*PC);
 % of a subject.
 
 
-%% D-prime
+%% D-prime:  The separation between noise and signal plus noise
 %
 % The goal of a psychophysicist is to learn something about the internal
 % response to a stimulus based on a behavioral responses.  In SDT terms,
@@ -189,7 +191,7 @@ dPrimeEst = zHit-zFA
 % dPrime values. Can you explain this pattern of results?
 
 
-%% The ROC curve
+%% The receiver operating characteristic (ROC) curve
 %
 % The criterion determines the trade-off between hits and false alarms.  A
 % low (liberal) criterion is sure to get a hit but will lead to lots of
@@ -215,7 +217,7 @@ plot(pFAs,pHits,'k-');
 % and false rate from the above example.
 plot(pFA,pHit,'ko','MarkerFaceColor','w');
 
-% Questions:
+% Questions about the ROC:
 %
 % 7. Add points to this ROC curve marking the hit and false alarm rates for
 % the 4 different criterion values you tried in question 6.
@@ -224,7 +226,7 @@ plot(pFA,pHit,'ko','MarkerFaceColor','w');
 % and increase/decrease the signal strength. How does the box of the ROC
 % curve change in these 4 examples and how does this relate to d-prime.
 
-%% Area under the ROC curve
+%% Being right:  The area under the ROC curve
 %
 % You hopefully saw that changing d-prime increases affects the bow of the
 % ROC curve away from the diagonal.  A measure of this bowing is the area
@@ -291,7 +293,7 @@ zFASim = norminv(pFASim);
 dPrimeSim = zHitSim-zFASim;
 fprintf('d-prime from simulation = %5.2f\n',dPrimeSim);
 
-% Questions:
+%% Questions about reliability and experimental design. 
 %
 % Compare the simulated values to the expected values from the STD model.
 % You can run this section over and over to look at the variability of the
@@ -304,20 +306,21 @@ fprintf('d-prime from simulation = %5.2f\n',dPrimeSim);
 % high or very low criterion? What does this tell us about the ideal design
 % of a psychophysics experiment (assuming our goal is to estimate d-prime)
 %
-% Extra Credit) If you're motivated, add a loop to simulate a bunch of simulations to
-% estimate the variability in the estimate for a range of model parameters.
+% Extra Credit) If you're motivated, add a loop to simulate a bunch of
+% simulations to estimate the variability in the estimate for a range of
+% model parameters.
 %
 % Simulations like this illustrate an often neglected fact:  A 'perfect'
 % subject that makes decisions according to Signal Detection Theory will
 % still have variability in performance from experimental run to
-% experimental run.  That is, ideal observers will still generate data
-% with finite-sized error bars.  Simulations can give you a feel for how
-% small the erorr bars should be under ideal conditions.
+% experimental run.  That is, ideal observers will still generate data with
+% finite-sized error bars.  Simulations can give you a feel for how small
+% the erorr bars should be under ideal conditions.
 %
 % 11. Beyond classic pychophysics investigations of sensory systems briefly
 % (1-2 paragraphs) discuss how signal detection theory has been used in
 % another area of psychology. There are many examples but this might
 % require a bit of outside research.
 
-
+%% End
 
