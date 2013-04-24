@@ -51,7 +51,7 @@ noiseMean = 0;
 signalMean = 1;
 sd = 1;
 
-%% Plot the two distributions
+%% Plot the signal and noise distributions
 %
 % Here is a graph of the probability distribution for the internal
 % responses to signal and noise trials:
