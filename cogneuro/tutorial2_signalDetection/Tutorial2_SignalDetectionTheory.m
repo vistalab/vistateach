@@ -272,12 +272,12 @@ pFASim = sum(response(~isSignal))/sum(~isSignal);
 % Show the simulated values in the table
 disp(' ');
 fprintf('Simulation of %d trials:\n',nTrials);
-disp('           |         Response     |')
-disp('  Signal   |  "Yes"    |  "No"    |')
+disp('           |       Response        |')
+disp('  Signal   |  "Yes"    |  "No"     |')
 disp('  ---------------------------------')
-fprintf('  Present  |   %3.1f%%   |   %3.1f   |\n',100*pHitSim,100*(1-pHitSim));
-disp('  ---------+-----------+----------|');
-fprintf('  Absent   |   %3.1f    |   %3.1f   |\n',100*pFASim,100*(1-pFASim));
+fprintf('  Present  |   %3.1f%%   |   %3.1f%%   |\n',100*pHitSim,100*(1-pHitSim));
+disp('  ---------+-----------+-----------|');
+fprintf('  Absent   |   %3.1f%%    |   %3.1f%%   |\n',100*pFASim,100*(1-pFASim));
 disp('  ---------------------------------');
 
 % plot it on the ROC curve
