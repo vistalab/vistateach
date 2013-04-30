@@ -105,8 +105,6 @@ function [resp, ok, figPos] = generalDialog(dlg, title, figPos)
 % ras, 05/16/08: added 'number' style.
 if notDefined('title'),    title = 'mrVista';         end
 
-javaFigs = mrvJavaFeature;
-
 resp = [];
 ok = 0;
 
@@ -115,11 +113,10 @@ ok = 0;
 %%%%%%%%%%%%%%
 nItems = length(dlg);
 font = 'Helvetica';
-if isunix, fontsz = 10; else, fontsz = 9; end
+if isunix, fontsz = 10; else fontsz = 9; end
 figColor = [.9 .9 .9]; % background color for figure
 
-% count the # of vertical lines in the dialog for each item
-nLines = 0;
+
 for i = 1:nItems
 	switch lower( dlg(i).style(1:4) )
 		case 'list'
@@ -129,7 +126,7 @@ for i = 1:nItems
 			if length(dlg(i).style) > 7
 				% empirically, we seem to have to divide the number by 2 --
 				% has something to do w/ smaller font sizes for the list
-				dlg(i).nLines = str2num(dlg(i).style(8:end)) / 2;
+				dlg(i).nLines = str2double(dlg(i).style(8:end)) / 2;
 			else
 				dlg(i).nLines = min(length(dlg(i).list), 6);
 			end
@@ -137,7 +134,7 @@ for i = 1:nItems
 		case {'edit' 'number'}
 			% edit field, allow multi-line specification
 			if length(dlg(i).style) > 4
-				dlg(i).nLines = str2num(dlg(i).style(5:end));
+				dlg(i).nLines = str2double(dlg(i).style(5:end));
 			else
 				dlg(i).nLines = 1;
 			end
@@ -146,7 +143,7 @@ for i = 1:nItems
 			dlg(i).nLines = max(1, size(dlg(i).value, 1));	
 		case 'file' % check for a read/write flag
 			dlg(i).nLines = 1;
-			if length(dlg(i).style) > 8 & lower(dlg(i).style(9))=='w'
+			if length(dlg(i).style) > 8 && lower(dlg(i).style(9))=='w'
 				dlg(i).readWrite = 'w';
 			else
 				dlg(i).readWrite = 'r';
@@ -176,7 +173,7 @@ end
 nLines = nLines + 2;
 
 
-if notDefined('figPos')  |  isequal(figPos, 'center')
+if notDefined('figPos')  ||  isequal(figPos, 'center')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Figure out how large the figure should            %
 	% be, based on how many lines need to be displayed: %
@@ -193,7 +190,7 @@ if notDefined('figPos')  |  isequal(figPos, 'center')
 	% if there's an existing figure, we'll set the dialog
 	% to be centered in that window; otherwise, we'll
 	% choose a reasonable start location
-	if isempty(get(0,'CurrentFigure')) | isequal(figPos, 'center')
+	if isempty(get(0,'CurrentFigure')) || isequal(figPos, 'center')
         % center onscreen
         figWidth = 0.6;
         corner = [0.2 0.5-(figHeight/2)];
@@ -259,7 +256,7 @@ for i = 1:nItems
 
         case {'edit' 'number'},
 			if isnumeric(dlg(i).value), str = num2str(dlg(i).value); 
-			else,						str = dlg(i).value;
+			else						str = dlg(i).value;
 			end
 			str = singleLineString(str);
 			
@@ -352,8 +349,6 @@ uicontrol('Style','pushbutton','String','Cancel',...
     'Callback','uiresume;','Tag','Cancel',...
     'Units','Normalized','Position',[.76 height/2 .2 height]);
 
-response = '';
-
 figOffscreenCheck(hfig);
 
 % wait for user to select values
@@ -382,7 +377,7 @@ for i = 1:length(h)
 					resp.(field) = singleLineString(resp.(field));
 				end
 		case 'number',
-			resp.(field) = str2num( get(h(i), 'String') );
+			resp.(field) = str2double( get(h(i), 'String') );
         case 'checkbox', 
 			resp.(field) = get(h(i),'Value');
 		case 'listbox',
@@ -396,16 +391,13 @@ end
 figPos = get(hfig, 'position');
 close(hfig);
 
-% re-set java figures feature to what it was before
-mrvJavaFeature(javaFigs);
-
 return
 % /-------------------------------------------------------------/ %
 
 
 
 % /-------------------------------------------------------------/ %
-function newStr = singleLineString(str);
+function newStr = singleLineString(str)
 % returns a string array that's one line (row), rather than a multi-line
 % matrix. The issue with the multi-line matrix is that they get padded with
 % spaces (char(32)), which can cause a string to "grow" gaps in it. For

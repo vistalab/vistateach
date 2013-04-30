@@ -1,4 +1,4 @@
-function [params im kspace spins gradients] = kspaceDemo(params)
+function [params, im, kspace, spins, gradients] = kspaceDemo(params)
 %
 %  A simple demonstration of Fourier imaging. 
 %   Written by Jonathan Winawer. 
@@ -68,7 +68,7 @@ for t = 1:T
     kspace = kspaceGetCurrentSignal(kspace, t, im, spins, params);
 
     % show the guts, if requested
-    [kspace M] = kspaceShowPlots(f, spins, gradients, kspace, im, params, t, b0noise, M);        
+    [kspace, M] = kspaceShowPlots(f, spins, gradients, kspace, im, params, t, b0noise, M);        
     
     if ~params.showProgress && ismember(t, updates), waitbar(t/T); end
 end
