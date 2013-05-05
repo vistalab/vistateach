@@ -117,9 +117,9 @@ pFA =  1-normalcdf(criterion,noiseMean,sd)
 % Questions:
 %
 % 1. Calculate the probability of a miss (fill in the computations below)
-pMiss = 1 - pHit
+pMiss = 
 % 2. Calculate the probability of correct rejection.
-pCR =  1 - pFA
+pCR =  
 
 % The whole table looks like this:
 disp(' ');
