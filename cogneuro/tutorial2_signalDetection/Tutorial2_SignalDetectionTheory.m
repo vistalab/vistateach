@@ -65,7 +65,7 @@ z = -4:.2:6;
 noise_y  = normalpdf(z,noiseMean,sd);
 signal_y = normalpdf(z,signalMean,sd);
 
-figure(1)
+rocFig = newGraphWin;
 clf
 plot(z,noise_y);
 hold on
@@ -106,20 +106,20 @@ hcrit = text(criterion,0,'criterion','VerticalAlignment','bottom','HorizontalAli
 % is calculated based on the area under the probability density function
 % representing internal responses to the signal that exceed the criterion.
 
-pHit = 1-normcdf(criterion,signalMean,sd)
+pHit = 1-normalcdf(criterion,signalMean,sd)
 
 % And the probability of a false alarm is calculated by integrating the
 % area under the function representing interal responses to noise that are
 % below the criterion.
 
-pFA =  1-normcdf(criterion,noiseMean,sd)
+pFA =  1-normalcdf(criterion,noiseMean,sd)
 
 % Questions:
 %
 % 1. Calculate the probability of a miss (fill in the computations below)
-pMiss = 
+pMiss = 1 - pHit
 % 2. Calculate the probability of correct rejection.
-pCR =
+pCR =  1 - pFA
 
 % The whole table looks like this:
 disp(' ');
@@ -179,8 +179,8 @@ fprintf(sprintf('  dPrime =    %5.2f\n',dPrime));
 % But fortunately we can estimate d-prime by finding the difference in the
 % corresponding z-values from the hit and false alarm rates:
 
-zHit = norminv(pHit)
-zFA = norminv(pFA)
+zHit = normalinv(pHit)
+zFA  = normalinv(pFA)
 
 dPrimeEst = zHit-zFA
 
@@ -201,9 +201,9 @@ dPrimeEst = zHit-zFA
 % curve.  An ROC curve is a plot of hits against false alarms for a range
 % of criterion values:
 
-pHits = 1-normcdf(z,signalMean,sd);
-pFAs  = 1-normcdf(z,noiseMean,sd);
-figure(2)
+pHits = 1-normalcdf(z,signalMean,sd);
+pFAs  = 1-normalcdf(z,noiseMean,sd);
+newGraphWin(rocFig)
 clf
 hold on
 plot([0,1],[0,1],'k:');
@@ -246,7 +246,7 @@ ROCarea = -trapz(pFAs,pHits)
 
 % d-prime can be calculated from the area under the ROC curve by:
 
-dPrimeFromArea = sqrt(2)*norminv(ROCarea)
+dPrimeFromArea = sqrt(2)*normalinv(ROCarea)
 
 % The calculus behind this is interesting but we'll pass on it. 
 
@@ -283,12 +283,12 @@ fprintf('  Absent   |   %3.1f%%    |   %3.1f%%   |\n',100*pFASim,100*(1-pFASim))
 disp('  ---------------------------------');
 
 % plot it on the ROC curve
-figure(2)
+newGraphWin(rocFig)
 hROC = plot(pFASim,pHitSim,'bo','MarkerFaceColor','w');
 
 % calculating d-prime from pHit and pCR
-zHitSim = norminv(pHitSim);
-zFASim = norminv(pFASim);
+zHitSim = normalinv(pHitSim);
+zFASim = normalinv(pFASim);
 
 dPrimeSim = zHitSim-zFASim;
 fprintf('d-prime from simulation = %5.2f\n',dPrimeSim);
