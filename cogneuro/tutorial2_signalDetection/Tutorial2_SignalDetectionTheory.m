@@ -11,15 +11,15 @@
 % stimulus.  The simplest experiment would be to present this stimulus over
 % multiple trials and ask if the subject saw it.  But this won't work
 % because, for example, the subject could simply say 'yes'on each trial.
-% To alleviate this catch trials can be included to keep the subject from
-% cheating.
+% To improve the experimental design, 'no stimulus' trials (catch trials)
+% should be included. 
 %
 % Now suppose you introduce catch trials (no stimulus trials) randomly on
-% half of the trials.  The subject's task is to determine if the signal was
+% half of the trials.  The subject's task is to determine if the signal is
 % present on any given trial.  Stimulus present trials are called 'signal'
-% trials, and stimulus absent trials are called 'noise' trials. A subject
-% that guesses, or says 'yes' or 'no' on every trial will be performing at
-% 50%, or chance level.  No more cheating.
+% trials, and no stimulus trials are called 'noise' trials. A subject
+% that guesses, or says 'yes' or 'no' on every trial will be perform at
+% 50%, or chance level.  
 %
 % There is a range of stimulus intensities where a subject will perform
 % somewhere between chance and 100% correct performance.  The presence of
@@ -117,9 +117,9 @@ pFA =  1-normalcdf(criterion,noiseMean,sd)
 % Questions:
 %
 % 1. Calculate the probability of a miss (fill in the computations below)
-pMiss = 
+pMiss =
 % 2. Calculate the probability of correct rejection.
-pCR =  
+pCR = 
 
 % The whole table looks like this:
 disp(' ');
