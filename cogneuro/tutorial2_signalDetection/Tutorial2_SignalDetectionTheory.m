@@ -65,7 +65,7 @@ z = -4:.2:6;
 noise_y  = normalpdf(z,noiseMean,sd);
 signal_y = normalpdf(z,signalMean,sd);
 
-rocFig = newGraphWin;
+newGraphWin;
 clf
 plot(z,noise_y);
 hold on
@@ -203,8 +203,8 @@ dPrimeEst = zHit-zFA
 
 pHits = 1-normalcdf(z,signalMean,sd);
 pFAs  = 1-normalcdf(z,noiseMean,sd);
-newGraphWin(rocFig)
-clf
+newGraphWin;
+
 hold on
 plot([0,1],[0,1],'k:');
 axis equal
@@ -283,7 +283,7 @@ fprintf('  Absent   |   %3.1f%%    |   %3.1f%%   |\n',100*pFASim,100*(1-pFASim))
 disp('  ---------------------------------');
 
 % plot it on the ROC curve
-newGraphWin(rocFig)
+
 hROC = plot(pFASim,pHitSim,'bo','MarkerFaceColor','w');
 
 % calculating d-prime from pHit and pCR
