@@ -278,7 +278,7 @@ modQ_Sq = 1;
 
 % Synthesize measurements from model
 %l_q=length(grad_dirs);
-cosTheta = grad_dirs*fibredir';
+cosTheta = grad_dirs*fibredir(:);
 cosThetaSq = cosTheta.^2;
 % difftime = (delta-smalldel/3);
 difftime = 1;
