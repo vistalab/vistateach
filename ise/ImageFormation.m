@@ -15,11 +15,7 @@
 % 01.02.08   Verified with local files for single download - BW
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Visual Angle
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Visual Angle
 
 % To think about the effect of an image on the eye, we must
 % specify the image in terms of degrees of visual angle.  As an
@@ -32,8 +28,7 @@ viewingDistance = 12
 
 % The viewing geometry is illustrated in this figure:
 %
-f = figure
-set(f,'Position',[700 600 384 256])
+vcNewGraphWin;
 line([0 viewingDistance 0 0],[0 0 1 0]); 
 axis equal, axis square
 set(gca,'xlim',[-2 20]), grid on
@@ -65,11 +60,7 @@ SecPerDot = 60*MinPerDot
 % spacing is wider than the spacing that can be just
 % discriminated by the human eye.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% The Westheimer linespread function
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The Westheimer linespread function
 
 % Westheimer calculated that the linespread function of the human
 % eye, specified in terms of minutes of arc and using a 3mm
@@ -85,7 +76,7 @@ xMin = xSec/60;
 ls = 0.47*exp(-3.3 *(xMin.^2)) + 0.53*exp(-0.93*abs(xMin));
 ls = ls / sum(ls);
 
-figure
+vcNewGraphWin;
 plot(xSec,ls)
 set(gca,'xlim',[-240 240],'xtick',(-240:60:240)), grid  on
 xlabel('Arc sec'), ylabel('Responsivity'), title('Westheimer Linespread')
@@ -101,11 +92,7 @@ xlabel('Arc sec'), ylabel('Responsivity'), title('Westheimer Linespread')
 % produce images that were very realistic in their appearance.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Convolution of the image and linespread
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Convolution of the image and linespread
 
 % We can estimate the visual image created by an image printed at
 % 600 dpi using the following simple convolution
@@ -120,7 +107,7 @@ im(1:dotSpacing:length(im)) = ones(size(im(1:dotSpacing:length(im))));
 
 % Here is an image showing the sampled line positions
 % (The lines represent a printer dot)
-
+vcNewGraphWin;
 imshow(im(ones(1,128),1:512))
 title('Image of line stimulus'); 
 
@@ -130,9 +117,9 @@ title('Image of line stimulus');
 % function.  Remember: we sampled the linespread once every sec
 % of arc. So, we can simply convolve the image and the linespread
 % function now as:
-
 retIm = conv2(ls,im,'full');
-figure
+
+vcNewGraphWin;
 plot(retIm),grid on
 title('The one-dimensional retinal image')
 xlabel('Sec of arc'), ylabel('Image intensity')
@@ -156,14 +143,14 @@ gKernel = gausswin(30,2)';  % This produces a little Gaussian window for filteri
 blurIm = conv2(im,gKernel,'full');
 blurIm = ieScale(blurIm,1,32);
 retIm = conv2(blurIm,ls,'full');
-figure
+vcNewGraphWin;
 imshow(blurIm(ones(1,128),1:512),[]);
 title('Image of line stimulus blurred by ink width');
 
 % Notice the very small ripples left in the curve after taking
 % into account the blurring by the physical display and by the
 % eye. 
-figure
+vcNewGraphWin;
 plot(retIm), axis square, grid on
 title('Retinal image of blurred lines')
 xlabel('Sec of arc'), ylabel('Intensity')
@@ -178,11 +165,8 @@ xlabel('Sec of arc'), ylabel('Intensity')
 
 close all
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Looking at defocus in the frequency domain
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Looking at defocus in the frequency domain
 
 % First, make a new linespread function that is smaller and
 % easier to compute with.  Have it extend over 1 deg (60 min) so
@@ -192,7 +176,7 @@ xMin = -30:1:29;
 ls = 0.47*exp(-3.3 *(xMin.^2)) + 0.53*exp(-0.93*abs(xMin));
 ls = ls / sum(ls);
 
-figure
+vcNewGraphWin;
 plot(xMin,ls), grid on
 xlabel('Min of arc'),ylabel('Linespread value')
 
@@ -204,7 +188,7 @@ nSamples = length(xMin);
 f = 1;
 harmonic = cos(2*pi*f*xMin/nSamples);
 
-figure
+vcNewGraphWin;
 plot(xMin,harmonic), grid on
 title('Sampled cosinusoid')
 xlabel('Arc sec'), ylabel('Intensity')
@@ -215,7 +199,7 @@ xlabel('Arc sec'), ylabel('Intensity')
 % will store the amplitude of the cosinusoid in the variable
 % "peak".
 
-figure
+vcNewGraphWin;
 freq =[1 5 10 15]; 
 peak = zeros(1,length(freq)); 
 for i = 1:length(freq)
@@ -232,7 +216,7 @@ end
 % fact that at f = 0 the amplitude = 1 (because the area under
 % the linespread is 1).
 
-figure
+vcNewGraphWin;
 plot([0 freq],[1 peak],'-')
 set(gca,'ylim',[0 1])
 xlabel('Spatial freq (cpd)'), ylabel('Transfer')
@@ -255,11 +239,7 @@ hold off
 % The functions match, which should give you some intuition about
 % what the amplitude of the Fourier Transform represents.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% Comparison of the pointspread and linespread
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Comparison of the pointspread and linespread
 
 % When working with two-dimensional inputs, we must consider the
 % pointspread function, that is the response to an input that is
@@ -273,7 +253,7 @@ xMin = xSec/60;
 ls = 0.47*exp(-3.3 *(xMin.^2)) + 0.53*exp(-0.93*abs(xMin));
 ps = 0.952*exp(-2.59*abs(xMin).^1.36) + 0.048*exp(-2.43*abs(xMin).^1.74);
 
-figure
+vcNewGraphWin;
 p = plot(xSec,ps,'r-',xSec,ls,'b--'), grid on
 set(gca,'xlim',[-180 180])
 xlabel('Arc sec'), ylabel('LS or PS amplitude')
@@ -293,17 +273,14 @@ D = X.^2 + Y.^2; D = D.^0.5;
 % Then, compute the pointspread function and make a picture of it
 %
 ps = 0.952*exp(-2.59*abs(D).^1.36) + 0.048*exp(-2.43*abs(D).^1.74);
-figure
+vcNewGraphWin;
 colormap(cool(64)), mesh(ps)
 
 % To see the pointspread as an image, rather than as a mesh plot,
 % you might make this figure: colormap(gray(32)),imagesc(ps), axis image
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% Chromatic aberration:  How the linespread varies with wavelength
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Chromatic aberration:  How the linespread varies with wavelength
 
 % The linespread varies quite strongly with wavelength.  When the
 % eye is in good focus at 580 nm (yellow-part of the spectrum)
@@ -325,7 +302,7 @@ load lineSpread;
 % linespread function is much more spread-out than for the middle
 % and long wavelengths.
 
-figure
+vcNewGraphWin;
 plot(xDim, lineSpread(80, :), 'b-', xDim, lineSpread(200,:), ...
       'g:', xDim, lineSpread(361, :), 'r--' );
 legend('wavelength 450', 'wavelength 570','wavelength 730');
@@ -335,7 +312,7 @@ title('Linespread functions for three wavelengths');
 %  Look at the line spread functions for all wavelengths
 
 lw = 1:10:length(wave);
-figure
+vcNewGraphWin;
 colormap(hot(32));
 mesh(xDim, wave(lw), lineSpread(lw,:)); 
 set(gca,'xlim',[-1 1],'ylim',[350 730])
@@ -350,6 +327,7 @@ ylabel('wavelength (nm)'); xlabel('degrees'); zlabel('intensity');
 % Here, we create and display the image of sample lines.
 
 im = reshape([0 0 0 1 0 0 0 0]' * ones(1, 16), 1, 128);
+vcNewGraphWin;
 imshow(im(ones(100,1), 1:128));
 
 % To calculate the retinal image for this pattern, we
@@ -369,7 +347,7 @@ X = (-size(retIm,2)/2 : ((size(retIm, 2)/2) - 1)) / 64;
 % We can plot the retinal image corresponding to two wavelengths
 % this way.
 
-figure
+vcNewGraphWin([],'tall');
 subplot(2,1,1)
 plot(X,retIm(201,:),'g-')
 set(gca,'ylim',[0 0.5])
@@ -398,11 +376,8 @@ mean(retIm(200,:),2)
 % retinal image, while the 570 nm component would be quite easy
 % to detect.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Chromatic aberration in the frequency domain
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Chromatic aberration in the frequency domain
 
 % Finally, let's make a few graphs of the modulation transfer
 % function of the eye's optical system for individual
@@ -418,7 +393,7 @@ load combinedOtf;
 
 % Here is a graph of a few of the MTFs
 % 
-figure
+vcNewGraphWin;
 plot(sampleSf, combinedOtf(81, :), 'b-', ...
     sampleSf, combinedOtf(201,:), ...
     'g:', sampleSf, combinedOtf(361, :), 'r--' );
@@ -435,11 +410,8 @@ title('Modulation transfer functions for 3 wavelengths');
 % "spurious resolution."
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% More modern Linespreads, Pointspreads, and MTFs  (01.07.99, BW)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% More modern Linespreads, Pointspreads, and MTFs  (01.07.99, BW)
 
 % In recent years, Ijspeert and others in the Netherlands
 % developed a more extensive set of functions to predict the
@@ -477,7 +449,7 @@ iLSF = iLSF/sum(iLSF);
 
 % These are the modulation transfer function and linespread
 % for the ijspeert data
-figure; %clf
+vcNewGraphWin([],'wide'); %clf
 subplot(1,2,1), plot(iMTF); grid on
 set(gca,'xtick',(0:10:80),'xlim',[0 80]);
 xlabel('Spatial frequency (cpd)');
@@ -485,7 +457,6 @@ ylabel('Amplitude');
 title('MTF')
 
 % Here is the linespread function
-
 subplot(1,2,2), plot(angleInSec,iLSF); grid on
 xlabel('Position (sec)');
 ylabel('Intensity');
@@ -499,7 +470,7 @@ ls = 0.47*exp(-3.3 *(xMin.^2)) + 0.53*exp(-0.93*abs(xMin));
 ls = ls / sum(ls);
 westMTF = abs(fft(ls));
 
-clf
+vcNewGraphWin([],'wide');
 subplot(1,2,1)
 plot(angleInSec/60,iLSF,'b-',angleInSec/60,ls,'r-')
 set(gca,'xtick',(-8:2:8),'xlim',[-6 6]);
@@ -548,11 +519,11 @@ for ii=1:nSamples
       freqIndexRange, a);
 end
 
-clf;
+vcNewGraphWin;
 colormap(cool(64));
 surf(angleInRad2D,angleInRad2D,iPSF2D);
 
-% END OF TUTORIAL
+%% END OF TUTORIAL
 
 %%% BEGIN TUTORIAL QUESTIONS -- 
 %
