@@ -156,7 +156,7 @@ else
     imagesc(imsize, imsize, b0noise)
 end
 
-%drawnow;
+drawnow;
 %%
 figure(f+1)
 % %-----------------------------------
