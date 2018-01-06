@@ -10,6 +10,8 @@
 %   checked: 
 %       Rory Sayres: Oct, 2007 
 %       Jon Winawer: Sep, 2009
+%       Brian Wandell:  January, 2018
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This tutorial covers two related topics.  First, pulse sequence methods

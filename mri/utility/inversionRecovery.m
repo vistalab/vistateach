@@ -10,7 +10,6 @@ axis(axis); grid on; ylabel('B0 axis'); cla
 m = [0,10]; [p0,r0] = cart2pol(m(1),m(2));
 a = arrow([0,0],m(1:2));  set(a,'edgecolor',[1,0,0])
 pause(0.5)
-
 txt = text(-2,10,'180-deg rf pulse');
 pause(0.4);
 
