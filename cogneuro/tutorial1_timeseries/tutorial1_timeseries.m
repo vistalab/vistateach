@@ -32,14 +32,18 @@ figure; colormap('gray')
 % experiment where the subject was presented either words or scrambled
 % words. Brain volumes were collected every 2 seconds (TR = 2seconds).
 
-% Make a movie of slice number 10
+% Make a movie of slice number 15
 for ii = 1:size(data,4)
     % Show the image of this slice during volume number ii
-    imagesc(squeeze(data(:,:,10,ii))); 
+    imagesc(squeeze(data(:,:,15,ii))); 
+    title(sprintf('Volume %d, time=%d seconds',ii,ii*2));
     % pause for .2 seconds. This means that the video is 10x as fast as the
     % real data acquisition
     drawnow; pause(.2);
 end
+
+% QUESTION: What are the circles at the left side of the image that show
+% large changes in signal intensity? Hint: They are outside of the brain
 
 %% View the time series from a single voxel
 
@@ -87,8 +91,14 @@ title('Voxel 53 (row) 65 (col) 10 (slice) time series')
 % volume during which the event occured meaning that there are a block of
 % six volumes devoted to each occurance of the stimulus
 
-events_words    = [12:17 21:26 41:46 61:66 86:91 95:100];
-events_scramble = [4:9 32:37 52:57 69:74 77:82 104:109];
+events_words    = [12:17, 21:26, 41:46, 61:66, 86:91, 95:100];
+events_scramble = [4:9, 32:37, 52:57, 69:74, 77:82, 104:109];
+
+% A NOTE FOR "REAL" DATA ANALYSIS
+% In most analysis packages there are different ways to code the timing of
+% events. This is usually called an event file or stimulus file. They are
+% always essentially the same thing: a text file or spreadsheet denoting
+% what happened when and for how long.
 
 % Now that we have our event times expressed in terms of scan number we can
 % make an ideal time series that would reflect the expected response
@@ -97,7 +107,7 @@ events_scramble = [4:9 32:37 52:57 69:74 77:82 104:109];
 % predicted time series for words and column 2 containing the predicted
 % time series for scrambled words. There will be 114 rows in the matrix
 % because there were 114 volumes collected in the fMRI experiment. This is
-% called the design matrix because it denotes the experimental design.
+% called the DESIGN MATRIX because it denotes the experimental design.
 
 % First we allocate a 114x2 matrix full of zeros
 X = zeros(114,2); 
@@ -134,6 +144,7 @@ imagesc(X');
 colormap('gray'); xlabel('Volume Number'); 
 set(gca, 'ytick',[1 2],'yticklabel', {'words' 'scramble'});
 
+% THE DESIGN MATRIX IS CRITICAL TO UNDERSTAND FOR FMRI ANALYSIS
 
 %% Analyze the time series
 
@@ -150,6 +161,7 @@ set(gca, 'ytick',[1 2],'yticklabel', {'words' 'scramble'});
 load hrf.mat
 figure; 
 plot(hrf); xlabel('Volume (TR = 2 seconds)');
+ylabel('Canonical BOLD response to a neural impulse')
 
 % Question:
 %
@@ -159,7 +171,7 @@ plot(hrf); xlabel('Volume (TR = 2 seconds)');
 % stimuli? Based on this HRF give a few examples of questions that are and
 % are not appropriate to adress with fMRI.
 
-%% Convert the raw scanner numbers to a percent contrast
+%% Convert the raw scanner numbers to percent signal change
 
 % The digital values coming from the scanner have no physical significance.
 % digital values from some regions are a little higher than others for
@@ -198,7 +210,8 @@ grid on
 % are now smoothed in time to match the typical hemodynamic response. It is
 % not important that you understand this specific code, just the idea that
 % each event is multiplied or convolved with the known hemodynamic response
-% function (HRF)
+% function (HRF). Convolution is basically a fancy term for pointwise
+% multiplication
 
 tmp = conv(X(:,1),hrf); X(:,1) = tmp(1:length(X(:,1)));
 tmp = conv(X(:,2),hrf); X(:,2) = tmp(1:length(X(:,2)));
@@ -221,12 +234,15 @@ set(gca, 'ytick',[1 2],'yticklabel', {'word' 'scramble'});
 %% Fitting the linear model to the time series
 
 % In fMRI a linear model is used to estimate how much each event type
-% effects the measured BOLD signal. Another way to say this is that we want
-% to find the best way to scale our predictor matrix X to match our
-% measured signal. The scaling factor or weights for each condition are
-% related to the amount of BOLD signal modulation produced by that event.
-% Let's look at our predictors compare to our measured signal in this
-% voxel.
+% effects the measured BOLD signal. This is just a standard linear 
+% regression model that you already know from your stats classes. The main 
+% tricks are how we set up our matrix of predictor variables. 
+% Another way to explain this is that we want to find the best way to scale  
+% our predictor matrix X to match our measured signal. The scaling factor or 
+% weights for each condition are  related to the amount of BOLD signal 
+% modulation produced by that event. Let's look at our predictors compare 
+% to our measured signal in this voxel.
+
 figure; 
 subplot(2,1,1)
 plot(1:nTR,ts1)
@@ -264,7 +280,7 @@ set(gca,'xtick',1:4,'xticklabel',{'words' 'scramble' 'offset' 'linear trend'});
 % Matlab solves these problems with the very simple formula
 B = X\ts1;
 
-% This is the same as
+% THIS IS THE SAME AS
 %   B = regress(ts1, X);
 % if you have the statistics toolbox
 %
@@ -288,6 +304,7 @@ figure; hold
 plot(ts1_predicted,'-r')
 plot(ts1,'-b')
 
+% What about a scatter plot? What would that tell us?
 
 %% Calculate the beta values for the whole slice
 % Now we can loop over all the voxels in this slice (z=10) and fit this
@@ -382,9 +399,35 @@ overlay2dHeatmap(inplane(:,:,10),map, threshold)
 % using either fMRI or any other method that you have learned about in this
 % coures or elsewhere?
 
-%% Note
+%% Final Question 1: Compute statistics
 %
 % Before we put this figure in a manuscript we would have to calculate the
 % standard error of each beta value so that we could associate it with a
-% p-value. We will not get into that here though it is straightforward.
+% p-value. One of the complexities of doing statistics on fMRI data are
+% autocorrelations: each timepoint is correlated with the previous
+% timepoint for a variety of reasons. This means that the residuals of our
+% linear model have structure that makes it more difficult to compute
+% statistics. For those of you with a background in time series analysis
+% you will start thinking about a variety of methods like autoregressive
+% models and pre-whitening that are applicable here. In most analysis
+% packages there are standard ways to deal with these issues but this is
+% beyond the scope of this tutorial (or this course). For the time being,
+% let's forget about autocorrelation.
+%
+% Identify a group of voxels that looks interesting. For example, based on
+% one of the contrasts above. Average the timeseries for all the voxels.
+% This is often referred to as a region of interest (ROI).
+% Then use your favorite regression function to fit a linear model and
+% compute p-values for the different conditions (it's fine to ignore issues
+% noted above).
+
+%% Final Question 2: Compute correlation map
+%
+% Another interesting way to analyze fMRI data is to examine correlations
+% between the time-courses in different regions/voxels. This is often
+% refered to as "functional connectivity". Compute the correlation between
+% the timecourse from your ROI (above) and the timecourse in every other
+% voxel in the brain. Now visualize this correlation map. Is it
+% interesting/surprising that the fMRI signal in this region is correlated
+% with so many other regions?
 
